@@ -1,3 +1,4 @@
+import { supabase } from '../../../supabase';
 import React, { useState } from 'react';
 import { useLanguage } from '../../context/LanguageContext';
 import { Card, CardContent, CardHeader, CardTitle } from '../../components/ui/card';
@@ -18,10 +19,20 @@ export const MarketSelection: React.FC = () => {
   const [marketId, setMarketId] = useState('');
   const [date, setDate] = useState('');
 
-  const handleNext = (e: React.FormEvent) => {
+  const handleNext = async (e: React.FormEvent) => {
     e.preventDefault();
     if (district && block && panchayat && marketId && date) {
       const marketName = marketId === 'market1' ? 'Olagadam Sandhai' : marketId === 'market2' ? 'Perundurai Sandhai' : 'Vellakovil Sandhai';
+      await supabase.from("market_selection").insert([
+{
+  district: district,
+  block: block,
+  panchayat: panchayat,
+  market_id: marketId,
+  market_name: marketName,
+  market_date: date
+}
+]);
       setMarket({
         id: marketId,
         name: marketName,

@@ -1,4 +1,5 @@
-import React from 'react';
+import { supabase } from '../../../supabase';
+import React, { useState } from 'react';
 import { useLanguage } from '../../context/LanguageContext';
 import { Card, CardContent, CardHeader, CardTitle } from '../../components/ui/card';
 import { Button } from '../../components/ui/button';
@@ -11,6 +12,8 @@ import { Badge } from '../../components/ui/badge';
 
 export const VendorComplaints: React.FC = () => {
   const { t, language } = useLanguage();
+  const [complaintText, setComplaintText] = useState('');
+
 
   const complaints = [
     {
@@ -22,15 +25,7 @@ export const VendorComplaints: React.FC = () => {
       date: language === 'ta' ? '05 மார்ச் 2026' : 'March 05, 2026',
       status: 'pending'
     },
-    {
-      id: 'CMP001189',
-      type: language === 'ta' ? 'குப்பை சேகரிக்கப்படவில்லை' : 'Garbage not collected',
-      description: language === 'ta'
-        ? '���ேற்று குப்பை சேகரிக்கப்படவில்லை'
-        : 'Garbage not collected yesterday',
-      date: language === 'ta' ? '28 பிப்ரவரி 2026' : 'Feb 28, 2026',
-      status: 'in_progress'
-    },
+   
     {
       id: 'CMP001098',
       type: language === 'ta' ? 'வடிகால் பிரச்சனை' : 'Drainage problem',
@@ -55,6 +50,33 @@ export const VendorComplaints: React.FC = () => {
     }
   };
 
+  
+    const handleSubmit = async () => {
+
+  if (!complaintText.trim()) {
+    alert(language === 'ta' ? 'புகாரை எழுதுங்கள்' : 'Please write your complaint');
+    return;
+  }
+
+  const { error } = await supabase.from('complaints').insert([
+    {
+      vendor_id: "demo_vendor",
+      market_name: "Olagadam Sandhai",
+      complaint_text: complaintText,
+      status: "pending"
+    }
+  ]);
+
+  if (error) {
+    console.error(error);
+    alert(language === 'ta' ? 'புகார் சேமிக்க முடியவில்லை' : 'Failed to submit complaint');
+    return;
+  }
+
+  alert(language === 'ta' ? 'புகார் வெற்றிகரமாக சமர்ப்பிக்கப்பட்டது' : 'Complaint submitted successfully');
+
+  setComplaintText('');
+};
   const getStatusIcon = (status: string) => {
     switch (status) {
       case 'pending':
@@ -114,12 +136,15 @@ export const VendorComplaints: React.FC = () => {
               <div className="space-y-2">
                 <Label>{t('description')}</Label>
                 <Textarea
-                  rows={4}
-                  placeholder={language === 'ta' 
-                    ? 'உங்கள் புகாரை விரிவாக எழுதுங்கள்'
-                    : 'Describe your complaint in detail'
-                  }
-                />
+  rows={4}
+  value={complaintText}
+  onChange={(e) => setComplaintText(e.target.value)}
+  placeholder={language === 'ta' 
+    ? 'உங்கள் புகாரை விரிவாக எழுதுங்கள்'
+    : 'Describe your complaint in detail'
+  }
+/>
+
               </div>
 
               <div className="space-y-2">
@@ -137,7 +162,9 @@ export const VendorComplaints: React.FC = () => {
                 </div>
               </div>
 
-              <Button className="w-full bg-blue-600 hover:bg-blue-700">
+              <Button type="button" onClick={handleSubmit} className="w-full bg-blue-600 hover:bg-blue-700">
+
+
                 {t('submit')}
               </Button>
             </form>

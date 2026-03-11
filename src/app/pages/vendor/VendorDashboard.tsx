@@ -1,4 +1,5 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
+import { supabase } from '../../../supabase';
 import { useLanguage } from '../../context/LanguageContext';
 import { Card, CardContent, CardHeader, CardTitle } from '../../components/ui/card';
 import { Button } from '../../components/ui/button';
@@ -7,6 +8,7 @@ import { Link } from 'react-router';
 
 export const VendorDashboard: React.FC = () => {
   const { t, language } = useLanguage();
+  const [recentPayments, setRecentPayments] = useState<any[]>([]);
 
   const upcomingMarkets = [
     {
@@ -22,21 +24,22 @@ export const VendorDashboard: React.FC = () => {
       status: 'pending'
     }
   ];
+useEffect(() => {
+  const fetchRecentPayments = async () => {
+    const { data, error } = await supabase
+      .from("payments")
+      .select("market_name, amount, created_at")
+      .order("id", { ascending: false })
+      .limit(5);
 
-  const recentPayments = [
-    {
-      market: language === 'ta' ? 'ஓலகடம் சந்தை' : 'Olagadam Sandhai',
-      date: language === 'ta' ? '05 மார்ச் 2026' : 'March 05, 2026',
-      amount: '₹50',
-      status: 'paid'
-    },
-    {
-      market: language === 'ta' ? 'பெருந்துறை சந்தை' : 'Perundurai Sandhai',
-      date: language === 'ta' ? '28 பிப்ரவரி 2026' : 'Feb 28, 2026',
-      amount: '₹50',
-      status: 'paid'
+    if (!error && data) {
+      setRecentPayments(data);
     }
-  ];
+  };
+
+  fetchRecentPayments();
+}, []);
+
 
   return (
     <div className="space-y-6">
@@ -184,12 +187,17 @@ export const VendorDashboard: React.FC = () => {
                 <div className="flex items-center gap-3">
                   <DollarSign className="h-5 w-5 text-gray-600" />
                   <div>
-                    <h4 className="font-semibold">{payment.market}</h4>
-                    <p className="text-sm text-gray-600">{payment.date}</p>
+                    <h4 className="font-semibold">{payment.market_name}</h4>
+
+                    <p className="text-sm text-gray-600">
+  {new Date(payment.created_at).toLocaleDateString()}
+</p>
+
                   </div>
                 </div>
                 <div className="text-right">
-                  <p className="font-bold text-green-700">{payment.amount}</p>
+                  <p className="font-bold text-green-700">₹{payment.amount}</p>
+
                   <p className="text-xs text-green-600">{t('paid')}</p>
                 </div>
               </div>

@@ -1,72 +1,63 @@
+import { supabase } from '../../../supabase';
 import React, { useState } from 'react';
 import { useLanguage } from '../../context/LanguageContext';
 import { Card, CardContent, CardHeader, CardTitle } from '../../components/ui/card';
 import { Button } from '../../components/ui/button';
-import { CreditCard, Smartphone, Loader2, AlertCircle } from 'lucide-react';
+import { CreditCard, Loader2, AlertCircle } from 'lucide-react';
 import { useNavigate } from 'react-router';
 import { useBooking } from '../../context/BookingContext';
-import { useAuth } from '../../context/AuthContext';
-import { marketService } from '../../services/marketService';
-import { paymentService } from '../../services/paymentService';
 import { toast } from 'sonner';
 
 export const Payment: React.FC = () => {
   const { t, language } = useLanguage();
   const { booking } = useBooking();
-  const { session } = useAuth();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
 
-  const handlePayment = async () => {
-    // Ensure all required data is present to prevent crashes
-    if (!booking.market || !booking.stallType || !session) { 
-      toast.error(language === 'ta' ? 'முன்பதிவு விவரங்கள் குறைவாக உள்ளன' : 'Missing booking information');
+  const handlePayment = async (method: string) => {
+    if (!booking.market || !booking.stallType) {
+      toast.error(
+        language === 'ta'
+          ? 'முன்பதிவு விவரங்கள் குறைவாக உள்ளன'
+          : 'Missing booking information'
+      );
       return;
     }
 
     setLoading(true);
-    
+
     try {
-      // 1. Create the booking in the backend (mock)
-      const bookingResult = await marketService.createBooking({
-        vendorId: "demo_vendor",
-        marketId: booking.market.id,
-        marketName: booking.market.name,
-        marketDate: booking.market.date,
-        stallType: booking.stallType
-      });
-
-      if (bookingResult.success && bookingResult.data) {
-        const bookingData = bookingResult.data;
-        
-        // 2. Process payment (mock)
-        const paymentResult = await paymentService.processPayment({
-  vendorId: "demo_vendor",
-  marketId: booking.market.id,
-  marketName: booking.market.name,
-  amount: booking.amount,
-  paymentMethod: 'upi',
-  bookingId: bookingData.bookingId
-});
-
-        if (paymentResult.success && paymentResult.data) {
-          // 3. Confirm the booking
-          await marketService.confirmBooking(
-  bookingData.bookingId,
-  paymentResult.data.payment.paymentId
-);
-          
-          toast.success(language === 'ta' ? 'கட்டணம் வெற்றிகரமாக செலுத்தப்பட்டது!' : 'Payment successful!');
-          navigate('/vendor/qr-pass');
-        } else {
-          toast.error(language === 'ta' ? 'கட்டணம் தோல்வியுற்றது' : 'Payment failed');
+      const { error } = await supabase.from('payments').insert([
+        {
+          booking_id: `BK-${Date.now()}`,
+          vendor_id: 'demo_vendor',
+          market_id: booking.market.id,
+          market_name: booking.market.name,
+          amount: booking.amount,
+          payment_method: method
         }
-      } else {
-        toast.error(bookingResult.error || (language === 'ta' ? 'முன்பதிவு தோல்வியுற்றது' : 'Booking failed'));
+      ]);
+
+      if (error) {
+        console.error(error);
+        toast.error(
+          language === 'ta' ? 'கட்டணம் சேமிக்க முடியவில்லை' : 'Failed to save payment'
+        );
+        return;
       }
+
+      toast.success(
+        language === 'ta'
+          ? 'கட்டணம் வெற்றிகரமாக செலுத்தப்பட்டது!'
+          : 'Payment successful!'
+      );
+
+      navigate('/vendor/qr-pass');
     } catch (err) {
       console.error(err);
-      toast.error(language === 'ta' ? 'ஏதோ தவறு நடந்துவிட்டது' : 'Something went wrong');
+      toast.error(
+        language === 'ta' ? 'ஏதோ தவறு நடந்துவிட்டது' : 'Something went wrong'
+      );
     } finally {
       setLoading(false);
     }
@@ -103,12 +94,14 @@ export const Payment: React.FC = () => {
               {language === 'ta' ? 'தவறான அமர்வு' : 'Invalid Session'}
             </h2>
             <p className="text-red-700">
-              {language === 'ta' 
+              {language === 'ta'
                 ? 'முன்பதிவு விவரங்கள் கண்டறியப்படவில்லை. தயவுசெய்து மீண்டும் தொடங்கவும்.'
-                : 'Booking details not found. Please start the process again.'
-              }
+                : 'Booking details not found. Please start the process again.'}
             </p>
-            <Button onClick={() => navigate('/vendor/market-selection')} className="w-full bg-red-600 hover:bg-red-700">
+            <Button
+              onClick={() => navigate('/vendor/market-selection')}
+              className="w-full bg-red-600 hover:bg-red-700"
+            >
               {language === 'ta' ? 'மீண்டும் தொடங்கவும்' : 'Start Again'}
             </Button>
           </CardContent>
@@ -120,7 +113,6 @@ export const Payment: React.FC = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-green-50 to-blue-50 flex items-center justify-center p-4 py-12">
       <div className="w-full max-w-md space-y-4">
-        {/* Fee Details Card */}
         <Card className="shadow-lg">
           <CardHeader className="bg-gradient-to-r from-green-700 to-green-600 text-white rounded-t-lg">
             <CardTitle className="text-xl">{t('marketFee')}</CardTitle>
@@ -153,7 +145,6 @@ export const Payment: React.FC = () => {
           </CardContent>
         </Card>
 
-        {/* Payment Methods Card */}
         <Card className="shadow-lg">
           <CardHeader>
             <CardTitle>{t('selectPaymentMethod')}</CardTitle>
@@ -163,7 +154,7 @@ export const Payment: React.FC = () => {
               <button
                 key={method.id}
                 className="w-full border-2 rounded-lg p-4 hover:border-green-600 hover:bg-green-50 transition-all text-left group"
-                onClick={handlePayment}
+                onClick={() => handlePayment(method.id)}
                 disabled={loading}
               >
                 <div className="flex items-center gap-3">
@@ -176,8 +167,8 @@ export const Payment: React.FC = () => {
               </button>
             ))}
 
-            <Button 
-              onClick={handlePayment}
+            <Button
+              onClick={() => handlePayment('upi')}
               disabled={loading}
               className="w-full bg-green-600 hover:bg-green-700 text-lg py-6 mt-4 shadow-md"
             >
@@ -196,12 +187,10 @@ export const Payment: React.FC = () => {
           </CardContent>
         </Card>
 
-        {/* Security Note */}
         <div className="text-center text-xs text-gray-500 px-4">
           {language === 'ta'
             ? '🔒 உங்கள் கட்டணம் பாதுகாப்பாக செயலாக்கப்படுகிறது'
-            : '🔒 Your payment is processed securely'
-          }
+            : '🔒 Your payment is processed securely'}
         </div>
       </div>
     </div>

@@ -1,3 +1,4 @@
+import { supabase } from '../../../supabase';
 import React, { useState } from 'react';
 import { useLanguage } from '../../context/LanguageContext';
 import { Card, CardContent, CardHeader, CardTitle } from '../../components/ui/card';
@@ -38,13 +39,27 @@ export const StallTypeSelection: React.FC = () => {
     { value: 'others', label: t('others') },
   ];
 
-  const handleContinue = () => {
+  const handleContinue = async () => {
     if (!booking.market) {
       setError(language === 'ta' ? 'தயவுசெய்து முதலில் சந்தையைத் தேர்ந்தெடுக்கவும்' : 'Please select a market first');
       return;
     }
 
     if (selectedStallType && selectedCommodity) {
+      const { error } = await supabase.from("stall_booking").insert([
+  {
+    market_id: booking.market.id,
+    stall_type: selectedStallType,
+    commodity: selectedCommodity,
+    booking_fee: getPrice()
+  }
+]);
+
+if (error) {
+  console.error(error);
+  setError(language === 'ta' ? 'தரவு சேமிக்க முடியவில்லை' : 'Failed to save data');
+  return;
+}
       setStallType(selectedStallType);
       setCommodity(selectedCommodity);
       navigate('/vendor/payment');
