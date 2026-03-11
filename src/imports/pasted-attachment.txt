@@ -1,0 +1,289 @@
+Modify the existing Smart Sandhai TN project.
+
+IMPORTANT:
+Do NOT regenerate the application.
+Do NOT redesign the UI.
+Do NOT change navigation bars, layout, language toggle, responsive structure, or screen structure.
+
+Only modify the **Field Officer module workflow and pages** and update the **Panchayat Officer module content** as described below.
+
+---
+
+FIELD OFFICER MODULE CORRECTIONS
+
+QR SCANNER PAGE WORKFLOW
+
+The QR Scanner page is used to verify vendor payment.
+
+When the officer scans a vendor QR code the system must display:
+
+Vendor Name
+Vendor ID
+Stall Type
+Market Name
+Payment Status
+
+If the payment status is **Paid**, show:
+
+Payment Status: Paid (green indicator)
+
+If the payment status is **Not Paid**, show:
+
+Payment Status: Not Paid (red indicator)
+
+Display a button:
+
+Collect Fee
+
+When the officer clicks **Collect Fee**, navigate to the **Fee Collection page**.
+
+---
+
+COLLECTION PAGE RENAME
+
+Rename the page currently called **Collections** to:
+
+Fee Collection
+
+---
+
+FEE COLLECTION PAGE PURPOSE
+
+The Fee Collection page is used only for collecting market stall fees.
+
+It must support two cases:
+
+1. Vendor coming from QR Scanner
+2. New vendor manual entry
+
+---
+
+CASE 1: VENDOR FROM QR SCAN
+
+If the officer came from the QR Scanner page, automatically display:
+
+Vendor Name
+Vendor ID
+Stall Type
+Market Name
+
+Display the fee amount based on stall type (₹20–₹100).
+
+Add a button:
+
+Collect Payment
+
+After payment show options:
+
+Generate Digital Receipt
+Print Receipt
+
+---
+
+CASE 2: NEW VENDOR MANUAL ENTRY
+
+If the vendor is new and has no QR code, allow manual vendor entry.
+
+Display input fields:
+
+Vendor Name
+Mobile Number
+Stall Type (Dropdown)
+
+Stall Type options:
+
+Vegetables
+Fruits
+Greens
+Fish
+Meat
+Poultry
+Groceries
+Grains
+Flowers
+Pots
+Iron Tools
+Clothes
+Toys
+Livestock
+Others
+
+System automatically calculates the stall fee.
+
+Officer presses:
+
+Collect Payment
+
+After payment the system generates:
+
+Vendor ID
+Digital Receipt
+
+---
+
+REPORT PAGE CORRECTION
+
+The Report page must display the list of vendors who participated in the market.
+
+Display a **table format** with columns:
+
+Vendor ID
+Vendor Name
+Stall Type
+Fee Amount
+Payment Status
+
+Example rows:
+
+VND2026001234 | Ramu Kumar | Vegetables | ₹30 | Paid
+VND2026001189 | Lakshmi Balaji | Fruits | ₹40 | Paid
+VND2026001145 | Murugan Selvam | Fish | ₹80 | Paid
+
+---
+
+REPORT SUMMARY
+
+Above the table show summary statistics:
+
+Total Vendors in Market
+Example: 120
+
+Total Vendors Paid
+Example: 95
+
+Total Fees Collected
+Example: ₹3,240
+
+---
+
+PRINT OPTION
+
+Add a button above the table:
+
+Print Market Report
+
+The printed report must include:
+
+Market Name
+Date
+Officer Name
+Vendor Table
+Total Fees Collected
+
+---
+
+PANCHAYAT OFFICER MODULE CORRECTIONS
+
+1. MARKET MANAGEMENT TEXT CORRECTION
+
+In the Panchayat Officer → Market Management page, the title currently says:
+
+"Weekly markets across Tamil Nadu"
+
+Change it to:
+
+"Weekly Markets in This Panchayat"
+or
+"Weekly Markets Under This Panchayat"
+
+The markets displayed must represent only the officer’s local panchayat area, not the whole state.
+
+---
+
+2. VENDOR MANAGEMENT PAGE CORRECTION
+
+The Vendor Management page currently shows statistics similar to the Vendor Dashboard such as:
+
+Markets This Month
+Total Spent
+Upcoming Market
+
+These belong to the vendor dashboard and should not appear in the Panchayat Officer interface.
+
+Replace this section with proper **Vendor Management features**.
+
+Display a table or list with:
+
+Vendor Name
+Vendor ID
+Vendor Type (Farmer / Trader)
+Stall Type
+Registered Market
+Status (Active / Suspended)
+
+Add action buttons:
+
+View Vendor
+Approve Vendor
+Suspend Vendor
+
+---
+
+3. REVENUE DASHBOARD VALUE CORRECTION
+
+The current revenue values are unrealistically high for a weekly market system where stall fees range from ₹20 to ₹100.
+
+Reduce the values to realistic numbers.
+
+Example values:
+
+Revenue Today
+₹3,240
++4.5%
+
+Weekly Revenue
+₹11,870
++6.2%
+
+Monthly Revenue
+₹46,500
++8.1%
+
+Average Per Market
+₹2,950
+(4 markets)
+
+Keep the charts and layout unchanged. Only update the numbers.
+
+---
+
+4. COMPLAINT CATEGORY CORRECTION
+
+In the Complaints section remove the following complaint types:
+
+Space Issue
+Facility Issue
+Officer Issue
+
+The complaint system must only show complaints related to market infrastructure and management such as:
+
+Garbage not collected
+Drainage problem
+No drinking water
+No toilet facility
+Poor lighting
+Market overcrowding
+Unauthorized vendors
+Fee Issue
+
+Existing complaint cards should be updated to reflect these allowed categories.
+
+---
+
+IMPORTANT
+
+Do NOT modify:
+
+Vendor module
+Vendor dashboard
+Vendor booking flow
+Payment system
+QR pass system
+Dashboard layout
+Officer navigation
+Language switching
+Navigation bars
+Responsive design
+UI layout
+
+Only apply the corrections described for the **Field Officer module** and **Panchayat Officer module**.

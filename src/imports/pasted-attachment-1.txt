@@ -1,0 +1,167 @@
+Update the existing Smart Sandhai / SandhaiConnect project without removing any current features.
+
+Do NOT redesign the whole app.
+Do NOT remove UI.
+Do NOT remove dashboards.
+Only fix logic and improve Vendor Management.
+
+----------------------------------
+1. FIX ROLE BASED DASHBOARD
+----------------------------------
+
+Currently vendor dashboard is showing in Panchayat login.
+
+Fix role based routing.
+
+Roles:
+vendor
+admin (panchayat)
+inspector
+
+After login:
+if role = vendor → /vendor/dashboard
+if role = admin → /admin/dashboard
+if role = inspector → /inspector/dashboard
+
+Vendor UI must not show in admin login.
+
+Do not change UI layout, only fix routing logic.
+
+
+----------------------------------
+2. FIX ERROR IN VENDOR BOOKING PAGE
+----------------------------------
+
+In vendor dashboard, when selecting stall type and proceeding, error occurs.
+
+Fix booking flow.
+
+Correct flow:
+
+Vendor selects market
+Vendor selects stall type
+System automatically sets fixed price
+Vendor clicks proceed
+Payment success (simulate)
+Booking saved
+QR generated
+QR shown in QR Pass
+
+Do NOT allow manual price input.
+
+Use fixed prices:
+
+Small Stall = 50
+Medium Stall = 100
+Large Stall = 150
+Roadside Vendor = 30
+
+After booking, redirect to QR Pass page.
+
+
+----------------------------------
+3. ADD PROPER VENDOR MANAGEMENT (ADMIN SIDE)
+----------------------------------
+
+Keep existing vendor page but add:
+
+Vendor ID
+Vendor Name
+Mobile
+Commodity
+Vendor Type
+Market
+Payment Status
+
+Add Vendor Type dropdown:
+
+Permanent Stall
+Temporary Stall
+Roadside Vendor
+Contract Vendor
+
+Add status:
+
+Pending
+Approved
+Blocked
+
+
+----------------------------------
+4. ADD PAYMENT HISTORY FOR VENDOR
+----------------------------------
+
+Admin should see:
+
+Vendor
+Market
+Date
+Amount
+Paid / Unpaid
+
+Do not change layout, just add table.
+
+
+----------------------------------
+5. ADD LICENSE VALIDITY FIELD
+----------------------------------
+
+Each vendor must have:
+
+License valid till date
+
+If expired, show warning.
+
+
+----------------------------------
+6. FIX QR GENERATION AFTER PAYMENT
+----------------------------------
+
+After payment success:
+
+create bookingId
+generate QR code
+save booking
+show QR in QR Pass
+
+QR must contain:
+
+vendorId
+bookingId
+marketId
+date
+
+
+----------------------------------
+7. DO NOT REMOVE EXISTING FEATURES
+----------------------------------
+
+Keep:
+
+QR pass
+My market
+Revenue dashboard
+Complaints
+Vendor dashboard UI
+Admin dashboard UI
+
+Only fix logic and add missing fields.
+
+
+----------------------------------
+8. FIX ERROR PAGE WHEN BOOKING
+----------------------------------
+
+Current bug:
+after selecting stall → error page
+
+Fix state handling.
+
+Ensure:
+
+stallType not null
+price exists
+market selected
+vendor logged in
+
+If missing → show message, not crash.
