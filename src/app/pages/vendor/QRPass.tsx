@@ -14,7 +14,10 @@ export const QRPass: React.FC = () => {
   const { session } = useAuth();
 
   // Use session instead of user (based on AuthContext read earlier)
-  const user = session?.user;
+  const user = {
+  userId: "VND001",
+  name: language === 'ta' ? 'ராமு குமார்' : 'Ramu Kumar'
+};
 
   // Generate a mock booking ID if not in booking state (for preview)
   const mockBookingId = `BK-${Date.now().toString().slice(-6)}`;

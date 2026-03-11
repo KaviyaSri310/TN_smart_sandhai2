@@ -19,7 +19,7 @@ export const Payment: React.FC = () => {
 
   const handlePayment = async () => {
     // Ensure all required data is present to prevent crashes
-    if (!booking.market || !booking.stallType || !session?.user) {
+    if (!booking.market || !booking.stallType || !session) { 
       toast.error(language === 'ta' ? 'முன்பதிவு விவரங்கள் குறைவாக உள்ளன' : 'Missing booking information');
       return;
     }
@@ -29,7 +29,7 @@ export const Payment: React.FC = () => {
     try {
       // 1. Create the booking in the backend (mock)
       const bookingResult = await marketService.createBooking({
-        vendorId: session.user.userId,
+        vendorId: "demo_vendor",
         marketId: booking.market.id,
         marketName: booking.market.name,
         marketDate: booking.market.date,
@@ -41,15 +41,20 @@ export const Payment: React.FC = () => {
         
         // 2. Process payment (mock)
         const paymentResult = await paymentService.processPayment({
-          bookingId: bookingData.bookingId,
-          amount: booking.amount,
-          method: 'upi',
-          vendorId: session.user.userId
-        });
+  vendorId: "demo_vendor",
+  marketId: booking.market.id,
+  marketName: booking.market.name,
+  amount: booking.amount,
+  paymentMethod: 'upi',
+  bookingId: bookingData.bookingId
+});
 
         if (paymentResult.success && paymentResult.data) {
           // 3. Confirm the booking
-          await marketService.confirmBooking(bookingData.bookingId, paymentResult.data.paymentId);
+          await marketService.confirmBooking(
+  bookingData.bookingId,
+  paymentResult.data.payment.paymentId
+);
           
           toast.success(language === 'ta' ? 'கட்டணம் வெற்றிகரமாக செலுத்தப்பட்டது!' : 'Payment successful!');
           navigate('/vendor/qr-pass');
