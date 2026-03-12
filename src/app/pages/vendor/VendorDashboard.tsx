@@ -9,6 +9,7 @@ import { Link } from 'react-router';
 export const VendorDashboard: React.FC = () => {
   const { t, language } = useLanguage();
   const [recentPayments, setRecentPayments] = useState<any[]>([]);
+  const [vendorData, setVendorData] = useState<any>(null);
 
   const upcomingMarkets = [
     {
@@ -36,8 +37,25 @@ useEffect(() => {
       setRecentPayments(data);
     }
   };
+  
 
   fetchRecentPayments();
+}, []);
+useEffect(() => {
+  const fetchVendor = async () => {
+    const { data, error } = await supabase
+      .from("vendors")
+      .select("vendor_name, vendor_id")
+      .order("id", { ascending: false })
+      .limit(1)
+      .single();
+
+    if (!error && data) {
+      setVendorData(data);
+    }
+  };
+
+  fetchVendor();
 }, []);
 
 
@@ -46,13 +64,16 @@ useEffect(() => {
       {/* Welcome Section */}
       <div className="bg-gradient-to-r from-green-700 to-green-600 text-white rounded-lg p-6">
         <h1 className="text-2xl font-bold mb-2">
-          {language === 'ta' ? 'வணக்கம், ராமு குமார்' : 'Welcome, Ramu Kumar'}
+          {language === 'ta'
+  ? `வணக்கம், ${vendorData?.vendor_name || 'ராமு குமார்'}`
+  : `Welcome, ${vendorData?.vendor_name || 'Ramu Kumar'}`
+}
         </h1>
         <p className="text-green-100">
-          {language === 'ta' 
-            ? 'வியாபாரி அடையாள எண்: VND2026001234'
-            : 'Vendor ID: VND2026001234'
-          }
+          {language === 'ta'
+  ? `வியாபாரி அடையாள எண்: ${vendorData?.vendor_id || 'VND2026001234'}`
+  : `Vendor ID: ${vendorData?.vendor_id || 'VND2026001234'}`
+}
         </p>
       </div>
 

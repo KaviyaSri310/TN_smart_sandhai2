@@ -1,3 +1,4 @@
+import { supabase } from '../../../supabase';
 import React, { useState } from 'react';
 import { useLanguage } from '../../context/LanguageContext';
 import { useAuth } from '../../context/AuthContext';
@@ -60,15 +61,22 @@ export const VendorRegistration: React.FC = () => {
     setLoading(false);
 
     if (result.success && result.data) {
-      // Login user
-      login(result.data.session);
-      
-      // Show vendor ID
-      alert(`✅ Registration Successful!\nYour Vendor ID: ${result.data.vendor.vendorId}`);
-      
-      // Navigate to dashboard
-      navigate('/vendor/dashboard');
-    } else {
+  const newVendorId = "VND" + Date.now().toString().slice(-6);
+
+  await supabase.from("vendors").insert([
+    {
+      vendor_name: vendorName,
+      mobile_number: mobileNumber,
+      vendor_id: newVendorId
+    }
+  ]);
+
+  login(result.data.session);
+
+  alert(`✅ Registration Successful!\nYour Vendor ID: ${newVendorId}`);
+
+  navigate('/vendor/dashboard');
+} else {
       setError(result.error || 'Verification failed');
     }
   };
